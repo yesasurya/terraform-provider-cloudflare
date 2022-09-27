@@ -8,6 +8,7 @@ import (
 	"time"
 
 	cloudflare "github.com/cloudflare/cloudflare-go"
+	"github.com/cloudflare/terraform-provider-cloudflare/internal/cache"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -184,10 +185,10 @@ func resourceCloudflareRecordCreate(ctx context.Context, d *schema.ResourceData,
 }
 
 func resourceCloudflareRecordRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*cloudflare.API)
-	zoneID := d.Get("zone_id").(string)
-
-	record, err := client.DNSRecord(ctx, zoneID, d.Id())
+	// client := meta.(*cloudflare.API)
+	// zoneID := d.Get("zone_id").(string)
+	// record, err := client.DNSRecord(ctx, zoneID, d.Id())
+	record, err := cache.GetDnsRecordFromCache(ctx, d, meta)
 	if err != nil {
 		var notFoundError *cloudflare.NotFoundError
 		if errors.As(err, &notFoundError) {
